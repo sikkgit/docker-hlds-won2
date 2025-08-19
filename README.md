@@ -41,9 +41,9 @@ Simply edit the `docker-compose.yml`, or copy it to `docker-compose.override.yml
 
 If you need to change the port of your server, change all occurences of `27015` (= in `ports` and in the `command` sections) to the desired port of your choice.
 
-```yml
-version: "3.0"
+here is the default docker-compose.yml file : 
 
+```yml
 services:
   hlds:
     build: .
@@ -58,7 +58,6 @@ services:
       - ./config/dmc:/server/hlds_l/dmc 
       - ./config/tfc:/server/hlds_l/tfc
     ports:
-      - 27015:27015
       - 27015:27015/udp
     command:
       - -port 27015 -game cstrike +map de_dust2 +maxplayers 16
@@ -78,11 +77,9 @@ If you desire to host a Counter-Strike Beta 7.1, 1.0, 1.1, 1.3, there will be a 
 +localinfo mm_gamedll "dlls/cs_i386.so"
 ```
 
-Example with a Counter-Strike 1.3 server:
+Example with a Counter-Strike 1.3 server on port **23000**:
 
 ```yml
-version: "3.0"
-
 services:
   hlds:
     image: "hlds1110"
@@ -90,10 +87,9 @@ services:
     volumes:
       - ./config/cstrk13:/server/hlds_l/cstrk13 
     ports:
-      - 27015:27015
-      - 27015:27015/udp
+      - 23000:23000/udp
     command:
-      - -port 27015 -game cstrk13 +map de_dust2 +maxplayers 16 +localinfo mm_gamedll "dlls/cs_i386.so"
+      - -port 23000 -game cstrk13 +map de_dust2 +maxplayers 16 +localinfo mm_gamedll "dlls/cs_i386.so"
     security_opt:
       - no-new-privileges:1
 ```
