@@ -6,6 +6,7 @@ services:
     image: "hlds1110"
     restart: always
     user: "1000:1000" # <- Change this to your UID:GID to fix potential permission issues
+    network_mode: host
     volumes:
       - ./config/cstrike:/server/hlds_l/cstrike 
       - ./config/cstrk10r:/server/hlds_l/cstrk10r
@@ -14,8 +15,6 @@ services:
       - ./config/cstrk71:/server/hlds_l/cstrk71
       - ./config/dmc:/server/hlds_l/dmc 
       - ./config/tfc:/server/hlds_l/tfc
-    ports:
-      - 27015:27015/udp
     command:
       - -port 27015 -game cstrike +map de_dust2 +maxplayers 16
     security_opt:

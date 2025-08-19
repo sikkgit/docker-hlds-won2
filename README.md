@@ -49,6 +49,7 @@ services:
     build: .
     image: "hlds1110"
     restart: always
+    network_mode: host
     volumes:
       - ./config/cstrike:/server/hlds_l/cstrike 
       - ./config/cstrk10r:/server/hlds_l/cstrk10r
@@ -57,8 +58,6 @@ services:
       - ./config/cstrk71:/server/hlds_l/cstrk71
       - ./config/dmc:/server/hlds_l/dmc 
       - ./config/tfc:/server/hlds_l/tfc
-    ports:
-      - 27015:27015/udp
     command:
       - -port 27015 -game cstrike +map de_dust2 +maxplayers 16
     security_opt:
@@ -82,12 +81,12 @@ Example with a Counter-Strike 1.3 server on port **23000**:
 ```yml
 services:
   hlds:
+    build: .
     image: "hlds1110"
     restart: always
+    network_mode: host
     volumes:
       - ./config/cstrk13:/server/hlds_l/cstrk13 
-    ports:
-      - 23000:23000/udp
     command:
       - -port 23000 -game cstrk13 +map de_dust2 +maxplayers 16 +localinfo mm_gamedll "dlls/cs_i386.so"
     security_opt:
