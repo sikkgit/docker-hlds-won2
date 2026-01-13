@@ -1,12 +1,12 @@
-# docker-hlds-won2
+# Half-Life 1.1.1.0 (WON2/Protocol 46) Image for Docker/Podman
 
 [![](https://c5.patreon.com/external/logo/become_a_patron_button.png)](https://patreon.baseq.fr)
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/P5P27UZHV)
 
-This project generates a Docker image that automates setting up a Half-Life dedicated server, version 1.1.1.0, using the WON2 protocol (also known as **Protocol 46**). This docker image also includes several popular mods that are still played using this version which are Counter-Strike 1.5, 1.3, 1.1, 1.0, Beta 7.1, Team Fortress Classic, and Deathmatch Classic.
+This project generates a Docker/Podman image that automates setting up a Half-Life dedicated server, version 1.1.1.0, using the WON2 protocol (also known as **Protocol 46**). This docker image also includes several popular mods that are still played using this version which are Counter-Strike 1.5, 1.3, 1.1, 1.0, Beta 7.1, Team Fortress Classic, and Deathmatch Classic.
 
 #### Related projects
-- [Docker image for HLDS 1.0.1.6](https://github.com/Ch0wW/docker-hlds-won2-1016)
+- [Docker/Podman image for HLDS 1.0.1.6](https://github.com/Ch0wW/docker-hlds-won2-1016)
 
 ---------------------
 
@@ -109,17 +109,20 @@ loginctl enable-linger hluser
 
 3) In a new SSH connection, connect as `hluser`.
 
+
+
+
 4) Clone the project, and enter the project's directory.
 
 5) Build the image required for the server (will take ~5 minutes)
 ```sh
-podman build -t hlds1110:latest ./
+podman build -t hlds1110:latest .
 ```
 
-6) We will create the proper fi
+6) We will create the subfolders required for a rootless podman configuration, and copy the container inside it.
 
 ```bash
-mkdir ~/.config/containers/systemd
+mkdir -p ~/.config/containers/systemd
 cp hlds1110.container ~/.config/containers/systemd/
 ```
 
@@ -168,16 +171,15 @@ systemctl --user daemon-reload
 
 8) Start the server.
 ```bash
-systemctl --user start hlds1110.container
+systemctl --user start hlds1110
 ```
 
 > [!NOTE]
-> You will have to make one container file per server. 
+> - You will have to make one container file per server. 
+> - If anything goes wrong, you can help yourself with this command to troubleshoot what's wrong : `/usr/libexec/podman/quadlet -dryrun -user`
 
 > [!WARNING]
-> Due to how systemd works, if you changed anything within the container file, you will have to type `systemctl --user daemon-reload` in order to refresh the files. 
-
-
+> Due to how systemd works, if you changed anything within the container file or created a new container, you will have to type `systemctl --user daemon-reload` in order to refresh the files. 
 
 ## Customizing your server configuration
 
@@ -200,7 +202,7 @@ Simply go to the `config` folder, and modify the required folders you wish.
 # Frequently Asked Questions
 
 ### Does this work with CS Beta 4.0 or very old betas?
-❌ **NO** . However, [This image for HLDS 1.0.1.6](https://github.com/Ch0wW/docker-hlds-won2-1016) can be used instead, as it supports a handful builds of Counter-Strike betas.
+❌ **NO** . However, [this Docker/Podman image for HLDS 1.0.1.6](https://github.com/Ch0wW/docker-hlds-won2-1016) can be used instead, as it supports a handful builds of Counter-Strike betas that worked on Linux.
 
 ### Am I required to set "sv_lan" to "1"?
 ❌ **No need to** ! It's already included inside the modified `hlds_run` script !
