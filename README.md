@@ -3,7 +3,7 @@
 [![](https://c5.patreon.com/external/logo/become_a_patron_button.png)](https://patreon.baseq.fr)
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/P5P27UZHV)
 
-This project generates a Docker/Podman image that automates setting up a Half-Life dedicated server, version 1.1.1.0, using the WON2 protocol (also known as **Protocol 46**). This docker image also includes several popular mods that are still played using this version which are Counter-Strike 1.5, 1.3, 1.1, 1.0, Beta 7.1, Team Fortress Classic, and Deathmatch Classic.
+This project generates a Docker/Podman image that automates setting up a Half-Life dedicated server, version 1.1.1.0, using the WON2 protocol (also known as **Protocol 46**). This image also allows using popular mods that are still played using this version which are Counter-Strike 1.5, 1.3, 1.1, 1.0, Beta 7.1. Team Fortress Classic and Deathmatch Classic are also included as a bonus.
 
 #### Related projects
 - [Docker/Podman image for HLDS 1.0.1.6](https://github.com/Ch0wW/docker-hlds-won2-1016)
@@ -206,6 +206,13 @@ Simply go to the `config` folder, and modify the required folders you wish.
 ### Does this project have bots ?
 ❌ **Not at all**. You are free to install PodBOT or YAPB manually if you desire.
 
+### How can I control my server remotely ?
+You will need to set up a RCON password within your `server.cfg` file, as there's no way to directly control your HLDS container.
+
+
 -----------
 
 This project uses files copyrighted by VALVe. 
+
+[![](https://c5.patreon.com/external/logo/become_a_patron_button.png)](https://patreon.baseq.fr)
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/P5P27UZHV)
