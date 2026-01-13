@@ -3,7 +3,7 @@
 [![](https://c5.patreon.com/external/logo/become_a_patron_button.png)](https://patreon.baseq.fr)
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/P5P27UZHV)
 
-This project generates a Docker image that automates setting up a Half-Life dedicated server, version 1.1.1.0, using the WON2 protocol. This docker image also includes several popular mods that are still played using this version which are Counter-Strike 1.5, 1.3, 1.1, 1.0, Beta 7.1, Team Fortress Classic, and Deathmatch Classic.
+This project generates a Docker image that automates setting up a Half-Life dedicated server, version 1.1.1.0, using the WON2 protocol (also known as **Protocol 46**). This docker image also includes several popular mods that are still played using this version which are Counter-Strike 1.5, 1.3, 1.1, 1.0, Beta 7.1, Team Fortress Classic, and Deathmatch Classic.
 
 #### Related projects
 - [Docker image for HLDS 1.0.1.6](https://github.com/Ch0wW/docker-hlds-won2-1016)
@@ -11,20 +11,25 @@ This project generates a Docker image that automates setting up a Half-Life dedi
 ---------------------
 
 # Requirements
-- docker
-- docker-compose
+- Basic Linux skills,
+- A dedicated user that **does not have** sudo/admin rights (for security reasons),
+- Either `docker` (easier to set up) **__OR__** `podman` version 5.4.2 or above (advanced but more secure).
 
-### Why this docker ?
+> [!TIP]
+> I recommand setting the user as `hluser` , as that is the one I will use throughout the installation guide !
 
-There are a few communities around the World that still play Counter-Strike 1.5 or other classic mods of Half-Life. However, I have noticed that some Linux distributions are not friendly with this version of HLDS due to potential library incompatibilities, and may instantly crash upon starting.
+### Why making this project ?
 
-A workaround was found since then, but I still wanted to provide a ready to use image for preservation purposes. Since Docker allows creating "*sandboxed*" environments using other versions of Linux, I created this project. 
+There are a few communities around the World that still play Counter-Strike 1.5 or other classic mods of Half-Life. However, I have noticed that some Linux distributions are not acting friendly with this version of HLDS due to several incompatibilities, by either having command issues, or by crashing upon startup.
+
+A workaround was found since then, by using either Docker or Podman along with an old version of Debian 8, which allows creating "*sandboxed*" Linux environments. Since game preservation is important, I decided to provide a ready-to-use image to create a WON2 server in minutes. 
 
 ### Features
-* Creates a barebones HLDS Environment using Debian (i386).
-* Includes all the dedicated server files in its vanilla configuration that can be configured outside the docker image.
-* Has WON2 patches, and can advertise on dedicated masterservers.
-* Includes Metamod 1.19 with AntiDLFix.
+* Creates a barebones HLDS Environment using a sandboxed version of Debian 8 (i386).
+* Only takes ~1Gb of Disk Space !
+* Includes all the dedicated server files in its vanilla configuration that can be configured without recompiling the Docker image.
+* Has WON2 patches, and advertises servers on both WON2.NET and the Order of Phalanx's masterservers.
+* Includes Metamod 1.21p38 with AntiDLFix.
 
 ### Included mods
 - Counter-Strike 1.5 (retail)
@@ -35,65 +40,146 @@ A workaround was found since then, but I still wanted to provide a ready to use 
 - Team Fortress Classic (v1.5)
 - Deathmatch Classic
 
-### Installation/Usage
+# Installation instructions
 
-Simply edit the `docker-compose.yml`, or copy it to `docker-compose.override.yml` to add or modify anything you require.
+## Docker Installation 
 
-If you need to change the port of your server, change all occurences of `27015` (= in `ports` and in the `command` sections) to the desired port of your choice.
+0) If not already done, install Docker.
 
-here is the default docker-compose.yml file : 
+1) First of all, make sure you have created the `hluser` user on your server. Don't forget to add him to the `docker` group (`usermod -aG docker hluser`)
+
+2) Log in as `hluser`.
+
+3) Clone the project, and enter the project's directory.
+
+4) Build the image required for the server (will take ~5 minutes)
+```sh
+docker build -t hlds1110:latest .
+```
+
+5) Then, copy the `docker-compose.yml` file to `docker-compose.override.yml`
+```bash
+cp docker-compose.yml docker-compose.override.yml
+```
+
+6) Edit `docker-compose.override.yml` to your likings.
+
+> [!CAUTION]
+> You need to set the UID/GID of the user you have created (using the command `id`), and replace it in the `user:"1000:1000"` part ; **otherwise you will have permission issues**.
+
+The commandline that is used to start the server is located in the `command` part. 
+
+If you need to change the port of your server, change the `-port 27015` parameter (in the `command` section) with the desired port of your choice.
+
+> [!WARNING]
+> if you desire to host a Counter-Strike Beta 7.1, 1.0, 1.1, 1.3, there will be a command **you will be required to add** at the end of your `command` subsection:
+```
+ +localinfo mm_gamedll "dlls/cs_i386.so"
+```
+
+For instance, here is a `docker-compose.override.yml` file which will create a CS 1.3 server on de_dust2 on port 27272 with 32 players slots: 
 
 ```yml
 services:
   hlds:
-    build: .
     image: "hlds1110"
     restart: always
     network_mode: host
     volumes:
-      - ./config/cstrike:/server/hlds_l/cstrike 
-      - ./config/cstrk10r:/server/hlds_l/cstrk10r
-      - ./config/cstrk11r:/server/hlds_l/cstrk11r
-      - ./config/cstrk13:/server/hlds_l/cstrk13 
-      - ./config/cstrk71:/server/hlds_l/cstrk71
-      - ./config/dmc:/server/hlds_l/dmc 
-      - ./config/tfc:/server/hlds_l/tfc
+      - ./config/cstrk13:/server/cstrk13 
     command:
-      - -port 27015 -game cstrike +map de_dust2 +maxplayers 16
-    security_opt:
-      - no-new-privileges:true
+      - -port 27272 -game cstrk13 +map de_dust2 +maxplayers 32 +localinfo mm_gamedll "dlls/cs_i386.so"
 ```
 
-Once done, just execute `docker compose up` to make sure everything works as intended, and you should be good to go. Change also the `user` token so that it is checking with the user and group running the container, to avoid upload issues or potential permission problems.
+7) Once done, just execute `docker compose up` to start up the server. If everything works well, you should be able to connect to the server.
 
-In case you need to rebuild the image, just type `docker compose build` and you should be good to go.
+In case you need to rebuild the image (for advanced purposes only), just type `docker compose build` and you should be good to go.
 
-### Important information !
 
-If you desire to host a Counter-Strike Beta 7.1, 1.0, 1.1, 1.3, there will be a command **you will be required to add** at the end of your `command` subsection:
+## Podman installation
 
-```
-+localinfo mm_gamedll "dlls/cs_i386.so"
-```
+0) If not already done, install Podman.
 
-Example with a Counter-Strike 1.3 server on port **23000**:
+1) First of all, make sure you have created the `hluser` user on your server. Don't forget to add subuid/subgid support (`usermod --add-subuids 100000-165535 --add-subgids 100000-165535 hluser`)
 
-```yml
-services:
-  hlds:
-    build: .
-    image: "hlds1110"
-    restart: always
-    network_mode: host
-    volumes:
-      - ./config/cstrk13:/server/hlds_l/cstrk13 
-    command:
-      - -port 23000 -game cstrk13 +map de_dust2 +maxplayers 16 +localinfo mm_gamedll "dlls/cs_i386.so"
-    security_opt:
-      - no-new-privileges:1
+2) As `root`, we will enable lingering for our user (so that the server will still be active when not connected through SSH): 
+```bash
+loginctl enable-linger hluser
 ```
 
-### Customizing your server configuration
+3) In a new SSH connection, connect as `hluser`.
+
+4) Clone the project, and enter the project's directory.
+
+5) Build the image required for the server (will take ~5 minutes)
+```sh
+podman build -t hlds1110:latest ./
+```
+
+6) We will create the proper fi
+
+```bash
+mkdir ~/.config/containers/systemd
+cp hlds1110.container ~/.config/containers/systemd/
+```
+
+7) Edit `~/.config/containers/systemd/hlds1110.container` to your likings.
+
+The commandline that is used to start the server is located in the `Exec` part. 
+
+If you need to change the port of your server, change the `-port 27015` parameter (in the `command` section) with the desired port of your choice.
+
+> [!WARNING]
+> if you desire to host a Counter-Strike Beta 7.1, 1.0, 1.1, 1.3, there will be a command **you will be required to add** at the end of your `Exec` subsection:
+```
+ +localinfo mm_gamedll "dlls/cs_i386.so"
+```
+
+For instance, here is a container file which will create a CS 1.3 server on de_dust2 on port 27272 with 32 players slots: 
+
+```systemd
+[Unit]
+Description=HLDS 1.1.1.0 (WON2) Server
+Wants=network-online.target
+After=network-online.target
+
+[Container]
+Image=localhost/hlds1110
+Network=host
+
+# Volumes
+Volume=%h/docker-hlds-won2/config/cstrk13:/server/cstrk13:z,U
+
+# Command user
+Exec=-port 27272 -game cstrk13 +map de_dust2 +maxplayers 32 +localinfo mm_gamedll "dlls/cs_i386.so"
+
+[Service]
+Restart=on-failure
+TimeoutSec=10
+
+[Install]
+WantedBy=multi-user.target
+```
+
+7) Refresh the systemd services & containers.
+```bash
+systemctl --user daemon-reload
+```
+
+8) Start the server.
+```bash
+systemctl --user start hlds1110.container
+```
+
+> [!NOTE]
+> You will have to make one container file per server. 
+
+> [!WARNING]
+> Due to how systemd works, if you changed anything within the container file, you will have to type `systemctl --user daemon-reload` in order to refresh the files. 
+
+
+
+## Customizing your server configuration
 
 Simply go to the `config` folder, and modify the required folders you wish.
 
@@ -104,10 +190,23 @@ Simply go to the `config` folder, and modify the required folders you wish.
 - `config/cstrk71` is for Counter-Strike Beta 7.1.
 - `config/tfc` is for Team Fortress Classic. 
 - `config/dmc` is for Deathmatch Classic. 
-- `config/valve` is for Half-Life. **However, since no playerbase really exists for Half-Life WON2 (people play it on STEAM instead), none of the system files have been included. If you still want to include custom data for your server, simply add whatever you wish inside the folder, and rebuild the image** 
+- `config/valve` is for Half-Life.
+
+> [!NOTE]
+> Since no playerbase exists for Half-Life WON2 (people play it on STEAM instead), none of the system files have been included. 
+> If you still want to include custom data or config for a Half-Life 1 server, simply add whatever you wish inside the folder, and rebuild the image.
+
+
+# Frequently Asked Questions
+
+### Does this work with CS Beta 4.0 or very old betas?
+❌ **NO** . However, [This image for HLDS 1.0.1.6](https://github.com/Ch0wW/docker-hlds-won2-1016) can be used instead, as it supports a handful builds of Counter-Strike betas.
 
 ### Am I required to set "sv_lan" to "1"?
-Nope! It's already included inside the modified `hlds_run` script, so you don't have to!
+❌ **No need to** ! It's already included inside the modified `hlds_run` script !
+
+### Does this project have bots ?
+❌ **Not at all**. You are free to install PodBOT or YAPB manually if you desire.
 
 -----------
 

@@ -1,4 +1,4 @@
-FROM i386/debian:8-slim
+FROM docker.io/i386/debian:8-slim
 
 # Force Debian 8 installation!
 RUN echo "deb http://archive.debian.org/debian jessie main contrib non-free" > /etc/apt/sources.list
@@ -16,11 +16,16 @@ RUN wget -q -O -  https://web.archive.org/web/20221208044729/http://dl.4players.
   tail -c+8338 | head -c121907818 | \
   tar -xzf - -C /server
 
+
+
 COPY install/hlds_l_3111e_update.tar.gz /server 
 RUN tar -xzf /server/hlds_l_3111e_update.tar.gz -C /server
 RUN rm /server/hlds_l_3111e_update.tar.gz
 
-WORKDIR /server/hlds_l/
+WORKDIR /server/
+
+# Move the hlds_l folder one level
+RUN mv ./hlds_l/* ./
 
 #Install WON2Fixes and modified HLDS_RUN
 USER root

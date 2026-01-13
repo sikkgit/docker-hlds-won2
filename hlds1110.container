@@ -1,0 +1,27 @@
+[Unit]
+Description=HLDS 1.1.1.0 (WON2) Server
+Wants=network-online.target
+After=network-online.target
+
+[Container]
+Image=localhost/hlds1110
+Network=host
+
+# Volumes
+Volume=%h/docker-hlds-won2/config/cstrike:/server/cstrike:z,U
+Volume=%h/docker-hlds-won2/config/cstrk13:/server/cstrk13:z,U
+Volume=%h/docker-hlds-won2/config/cstrk11r:/server/cstrk11r:z,U
+Volume=%h/docker-hlds-won2/config/cstrk10r:/server/cstrk10r:z,U
+Volume=%h/docker-hlds-won2/config/cstrk71:/server/cstrk71:z,U
+Volume=%h/docker-hlds-won2/config/dmc:/server/dmc:z,U
+Volume=%h/docker-hlds-won2/config/tfc:/server/tfc:z,U
+
+# Command user
+Exec=-port 27015 -game cstrike +map de_dust2 +maxplayers 16
+
+[Service]
+Restart=on-failure
+TimeoutSec=10
+
+[Install]
+WantedBy=multi-user.target
