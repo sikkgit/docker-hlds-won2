@@ -8,13 +8,13 @@ Image=localhost/hlds1110
 Network=host
 
 # Volumes
-Volume=%h/docker-hlds-won2/config/cstrike:/server/cstrike:z,U
-Volume=%h/docker-hlds-won2/config/cstrk13:/server/cstrk13:z,U
-Volume=%h/docker-hlds-won2/config/cstrk11r:/server/cstrk11r:z,U
-Volume=%h/docker-hlds-won2/config/cstrk10r:/server/cstrk10r:z,U
-Volume=%h/docker-hlds-won2/config/cstrk71:/server/cstrk71:z,U
-Volume=%h/docker-hlds-won2/config/dmc:/server/dmc:z,U
-Volume=%h/docker-hlds-won2/config/tfc:/server/tfc:z,U
+Volume=%h/docker-hlds-won2/config/cstrike:/server/cstrike:z
+Volume=%h/docker-hlds-won2/config/cstrk13:/server/cstrk13:z
+Volume=%h/docker-hlds-won2/config/cstrk11r:/server/cstrk11r:z
+Volume=%h/docker-hlds-won2/config/cstrk10r:/server/cstrk10r:z
+Volume=%h/docker-hlds-won2/config/cstrk71:/server/cstrk71:z
+Volume=%h/docker-hlds-won2/config/dmc:/server/dmc:z
+Volume=%h/docker-hlds-won2/config/tfc:/server/tfc:z
 
 # Command user
 Exec=-port 27015 -game cstrike +map de_dust2 +maxplayers 16

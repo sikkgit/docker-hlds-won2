@@ -147,7 +147,7 @@ Image=localhost/hlds1110
 Network=host
 
 # Volumes
-Volume=%h/docker-hlds-won2/config/cstrk13:/server/cstrk13:z,U
+Volume=%h/docker-hlds-won2/config/cstrk13:/server/cstrk13:z
 
 # Command user
 Exec=-port 27272 -game cstrk13 +map de_dust2 +maxplayers 32 +localinfo mm_gamedll "dlls/cs_i386.so"
