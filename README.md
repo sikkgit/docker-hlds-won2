@@ -12,11 +12,10 @@ This project generates a Docker/Podman image that automates setting up a Half-Li
 
 # Requirements
 - Basic Linux skills,
-- A dedicated user that **does not have** sudo/admin rights (for security reasons),
 - Either `docker` (easier to set up) **__OR__** `podman` version 5.4.2 or above (advanced but more secure).
 
 > [!TIP]
-> I recommand setting the user as `hluser` , as that is the one I will use throughout the installation guide !
+> We will have to create a new user for safety reasons ; I recommend naming the freshly created user `hluser` , as that is the one I will use throughout the installation guide !
 
 ### Why making this project ?
 
@@ -46,7 +45,7 @@ A workaround was found since then, by using either Docker or Podman along with a
 
 0) If not already done, install Docker.
 
-1) First of all, make sure you have created the `hluser` user on your server. Don't forget to add him to the `docker` group (`usermod -aG docker hluser`)
+1) First of all, make sure you have created the `hluser` user on your server. Don't forget to add the user to the `docker` group (`usermod -aG docker hluser`)
 
 2) Log in as `hluser`.
 
@@ -108,9 +107,6 @@ loginctl enable-linger hluser
 ```
 
 3) In a new SSH connection, connect as `hluser`.
-
-
-
 
 4) Clone the project, and enter the project's directory.
 
