@@ -46,9 +46,16 @@ A workaround was found since then, by using either Docker or Podman along with a
 
 0) If not already done, install Docker.
 
-1) First of all, make sure you have created the `hluser` user on your server. Don't forget to add the user to the `docker` group (`usermod -aG docker hluser`)
+1) First of all, make sure you have created the `hluser` user on your server. Don't forget to add the user to the `docker` group:
+```bash
+adduser hluser
+usermod -aG docker hluser
+```
 
 2) Log in as `hluser`.
+```bash
+su hluser
+```
 
 3) Clone the project, and enter the project's directory.
 
@@ -99,7 +106,10 @@ In case you need to rebuild the image (for advanced purposes only), just type `d
 
 ## Podman installation
 
-0) If not already done, install Podman.
+0) If not already done, install Podman. If you also have package `acl`, it's a good time to install it as well.
+```sh
+sudo apt install podman acl
+```
 
 1) First of all, make sure you have created the `hluser` user on your server. Don't forget to add subuid/subgid support :
 ```bash
@@ -112,18 +122,18 @@ usermod --add-subuids 100000-165535 --add-subgids 100000-165535 hluser
 loginctl enable-linger hluser
 ```
 
-3) In a new SSH connection, connect as `hluser`.
+3) In a **new SSH connection**, connect as `hluser`.
 
 4) Clone the project, and enter the project's directory.
 
 5) We'll set proper permissions for later, so that our user `hluser` will still have access to files later on on the `config` subdirectories. This will fix new files permissions for both the container & our user, as well as allowing custom sprays to be saved.
-```sh
+```bash
 setfacl -R -m d:u:hluser:rwx ./config/*
 setfacl -R -m u:hluser:rwx ./config/*
 ```
 
 6) Build the image required for the server (will take ~5 minutes)
-```sh
+```bash
 podman build -t hlds1110:latest .
 ```
 
@@ -174,7 +184,7 @@ TimeoutSec=10
 WantedBy=multi-user.target
 ```
 
-8) Refresh the systemd services & containers, then start the server.
+9) Refresh the systemd services & containers, then start the server.
 ```bash
 systemctl --user daemon-reload
 systemctl --user start hlds1110
