@@ -15,7 +15,8 @@ This project generates a Docker/Podman image that automates setting up a Half-Li
 - Either `docker` (easier to set up) **__OR__** `podman` version 5.4.2 or above (advanced but more secure).
 
 > [!TIP]
-> We will have to create a new user for safety reasons ; I recommend naming the freshly created user `hluser` , as that is the one I will use throughout the installation guide !
+> - We will have to create a new user for safety reasons ; **I recommend naming the freshly created user `hluser`, as that is the one I will use throughout the installation guide** ! 
+> - Also, we assume you are using Debian 13 as your Linux OS. If not, please adapt some commands to your needs. 
 
 ### Why making this project ?
 
@@ -66,7 +67,8 @@ cp docker-compose.yml docker-compose.override.yml
 > [!CAUTION]
 > You need to set the UID/GID of the user you have created (using the command `id`), and replace it in the `user:"1000:1000"` part ; **otherwise you will have permission issues**.
 
-The commandline that is used to start the server is located in the `command` part. 
+>[!NOTE]
+> The commandline that is used to start the server is located in the `command` part. 
 
 If you need to change the port of your server, change the `-port 27015` parameter (in the `command` section) with the desired port of your choice.
 
@@ -99,7 +101,11 @@ In case you need to rebuild the image (for advanced purposes only), just type `d
 
 0) If not already done, install Podman.
 
-1) First of all, make sure you have created the `hluser` user on your server. Don't forget to add subuid/subgid support (`usermod --add-subuids 100000-165535 --add-subgids 100000-165535 hluser`)
+1) First of all, make sure you have created the `hluser` user on your server. Don't forget to add subuid/subgid support :
+```bash
+adduser hluser
+usermod --add-subuids 100000-165535 --add-subgids 100000-165535 hluser
+```
 
 2) As `root`, we will enable lingering for our user (so that the server will still be active when not connected through SSH): 
 ```bash
@@ -110,21 +116,27 @@ loginctl enable-linger hluser
 
 4) Clone the project, and enter the project's directory.
 
-5) Build the image required for the server (will take ~5 minutes)
+5) We'll set proper permissions for later, so that our user `hluser` will still have access to files later on on the `config` subdirectories. This will fix new files permissions for both the container & our user, as well as allowing custom sprays to be saved.
+```sh
+setfacl -R -m d:u:hluser:rwx ./config/*
+setfacl -R -m u:hluser:rwx ./config/*
+```
+
+6) Build the image required for the server (will take ~5 minutes)
 ```sh
 podman build -t hlds1110:latest .
 ```
 
-6) We will create the subfolders required for a rootless podman configuration, and copy the container inside it.
-
+7) We will create the subfolders required for a rootless podman configuration, and copy the container inside it.
 ```bash
 mkdir -p ~/.config/containers/systemd
 cp hlds1110.container ~/.config/containers/systemd/
 ```
 
-7) Edit `~/.config/containers/systemd/hlds1110.container` to your likings.
+8) Edit `~/.config/containers/systemd/hlds1110.container` to your likings.
 
-The commandline that is used to start the server is located in the `Exec` part. 
+>[!NOTE]
+> The commandline that is used to start the server is located in the `Exec` part. 
 
 If you need to change the port of your server, change the `-port 27015` parameter (in the `command` section) with the desired port of your choice.
 
@@ -134,9 +146,9 @@ If you need to change the port of your server, change the `-port 27015` paramete
  +localinfo mm_gamedll "dlls/cs_i386.so"
 ```
 
-For instance, here is a container file which will create a CS 1.3 server on de_dust2 on port 27272 with 32 players slots: 
+For instance, here is a container file (= *quadlet*) which will create a CS 1.3 server on cs_italy on port 27272 with 32 players slots: 
 
-```systemd
+```ini
 [Unit]
 Description=HLDS 1.1.1.0 (WON2) Server
 Wants=network-online.target
@@ -146,12 +158,13 @@ After=network-online.target
 Image=localhost/hlds1110
 Network=host
 PodmanArgs=-it
+UserNS=keep-id
 
 # Volumes
 Volume=%h/docker-hlds-won2/config/cstrk13:/server/cstrk13:z
 
 # Command user
-Exec=-port 27272 -game cstrk13 +map de_dust2 +maxplayers 32 +localinfo mm_gamedll "dlls/cs_i386.so"
+Exec=-port 27272 -game cstrk13 +map cs_italy +maxplayers 32 +localinfo mm_gamedll "dlls/cs_i386.so"
 
 [Service]
 Restart=on-failure
@@ -161,22 +174,18 @@ TimeoutSec=10
 WantedBy=multi-user.target
 ```
 
-7) Refresh the systemd services & containers.
+8) Refresh the systemd services & containers, then start the server.
 ```bash
 systemctl --user daemon-reload
-```
-
-8) Start the server.
-```bash
 systemctl --user start hlds1110
 ```
 
 > [!NOTE]
 > - You will have to make one container file per server. 
-> - If anything goes wrong, you can help yourself with this command to troubleshoot what's wrong : `/usr/libexec/podman/quadlet -dryrun -user`
+> - If the service is not properly detected by podman/systemd, you can have a basic idea of what's wrong with this command : `/usr/libexec/podman/quadlet -dryrun -user`
 
 > [!WARNING]
-> Due to how systemd works, if you changed anything within the container file or created a new container, you will have to type `systemctl --user daemon-reload` in order to refresh the files. 
+> Due to how systemd works, if you changed anything within the quadlet, or created a new quadlet, you will have to type `systemctl --user daemon-reload` in order to refresh the files. 
 
 ## Customizing your server configuration
 
@@ -208,8 +217,7 @@ Simply go to the `config` folder, and modify the required folders you wish.
 ❌ **Not at all**. You are free to install PodBOT or YAPB manually if you desire.
 
 ### How can I control my server remotely ?
-You will need to set up a RCON password within your `server.cfg` file, as there's no way to directly control your HLDS container.
-
+You will need to set up a RCON password within your `server.cfg` file, as there's no way to directly control your HLDS container. (`rcon_password "mypassword"`)
 
 -----------
 
