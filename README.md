@@ -226,6 +226,9 @@ Simply go to the `config` folder, and modify the required folders you wish.
 ### Does this project have bots ?
 ❌ **Not at all**. You are free to install PodBOT or YAPB manually if you desire.
 
+### What version of AMXX can I use ? Because the latest version doesn't work...
+You need to use AMXX 1.8.2 or lower. For easier searches, I included inside `install/extras` the latest supported version of AMXX.
+
 ### How can I control my server remotely ?
 You will need to set up a RCON password within your `server.cfg` file, as there's no way to directly control your HLDS container. (`rcon_password "mypassword"`)
 
